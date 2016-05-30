@@ -22,7 +22,7 @@
  *    'Sun, 17 May 1998 03:00:00 GMT+01' => Date()
  */
 function parseDataFromRfc2822(value) {
-   throw new Error('Not implemented');
+   return new Date(value);
 }
 
 /**
@@ -37,7 +37,7 @@ function parseDataFromRfc2822(value) {
  *    '2016-01-19T08:07:37Z' => Date()
  */
 function parseDataFromIso8601(value) {
-   throw new Error('Not implemented');
+   return new Date(value);
 }
 
 
@@ -56,7 +56,12 @@ function parseDataFromIso8601(value) {
  *    Date(2015,1,1)    => false
  */
 function isLeapYear(date) {
-   throw new Error('Not implemented');
+    let year = date.getFullYear();
+    if (year % 4 == 0) {
+        if (year % 100 == 0 && year % 1000 != 0) return false;
+        return true;
+    }
+    return false;
 }
 
 
@@ -76,14 +81,27 @@ function isLeapYear(date) {
  *    Date(2000,1,1,10,0,0),  Date(2000,1,1,15,20,10,453)   => "05:20:10.453"
  */
 function timeSpanToString(startDate, endDate) {
-   throw new Error('Not implemented');
+   let diff_ms = endDate - startDate;
+   let hours = Math.floor(diff_ms / (3600000));
+   let minutes = Math.floor((diff_ms - hours * 3600000) / 60000);
+   let seconds = Math.floor((diff_ms - hours * 3600000 - minutes * 60000) / 1000);
+   let ms = diff_ms - hours * 3600000 - minutes * 60000 - seconds * 1000;
+   let string_date = '';
+   string_date += (hours < 10) ? '0' + hours : hours;
+   string_date += ':';
+   string_date += (minutes < 10) ? '0' + minutes : minutes;
+   string_date += ':';
+   string_date += (seconds < 10) ? '0' + seconds : seconds;
+   string_date += '.';
+   string_date += (ms < 10) ? '00' + ms : (ms < 100) ? '0' + ms : ms;
+   return string_date;
 }
 
 
 /**
  * Returns the angle (in radians) between the hands of an analog clock for the specified Greenwich time.
  * If you have problem with solution please read: https://en.wikipedia.org/wiki/Clock_angle_problem
- * 
+ *
  * @param {date} date
  * @return {number}
  *
@@ -94,7 +112,15 @@ function timeSpanToString(startDate, endDate) {
  *    Date.UTC(2016,3,5,21, 0) => Math.PI/2
  */
 function angleBetweenClockHands(date) {
-    throw new Error('Not implemented');
+    let utc_date =  date.toUTCString();
+    let hours_mins = utc_date.match(/[\d]+:[\d]+/)[0].split(':');
+    hours_mins[0] = Number(hours_mins[0]);
+    hours_mins[1] = Number(hours_mins[1]);
+    if (hours_mins[0] > 12) hours_mins[0] = hours_mins[0] - 12;
+    let rads = Math.abs(30 * hours_mins[0] - hours_mins[1] * 6);
+    rads = (rads * Math.PI) / 180;    
+    if (rads > Math.PI) rads = Math.PI * 2 - rads;
+    return rads;
 }
 
 
