@@ -333,7 +333,56 @@ function getDigitalRoot(num) {
  *   '{[(<{[]}>)]}' = true 
  */
 function isBracketsBalanced(str) {
-    throw new Error('Not implemented');
+    let state = {sq_br: 0, r_br: 0, s_br: 0, a_br:0, pred:'', opens: []};
+    for (let i = 0; i < str.length; i++) {
+        switch (str[i]) {
+            case '[':
+                state.sq_br++;
+                state.opens.push(str[i]);
+                break;
+            case ']':
+                if (!checkOpens(state, '[')) return false;
+                else
+                state.sq_br--;
+                break;
+            case '(':
+                state.r_br++;
+                state.opens.push(str[i]);
+                break;
+            case ')':
+                if (!checkOpens(state, '(')) return false;
+                state.r_br--;
+                break;
+            case '{':
+                state.s_br++;
+                state.opens.push(str[i]);
+                break;
+            case '}':
+                if (!checkOpens(state, '{')) return false;
+                state.s_br--;
+                break;
+            case '<':
+                state.a_br++;
+                state.opens.push(str[i]);
+                break;
+            case '>':
+                if (!checkOpens(state, '<')) return false;
+                state.a_br--;
+                break;
+        }
+        if (state.sq_br < 0 || state.r_br < 0 || state.s_br < 0 || state.a_br < 0) return false;
+    }
+    return (state.sq_br == 0 && state.r_br == 0 && state.s_br == 0 && state.a_br == 0);
+}
+
+function checkOpens(state, ch) {
+    if (state.opens[state.opens.length-1] != ch) return false;
+    else {
+        let index = state.opens.length-1;
+        delete state.opens[index];
+        state.opens.splice(index, 1);
+        return true;
+    }
 }
 
 
@@ -369,7 +418,19 @@ function isBracketsBalanced(str) {
  *
  */
 function timespanToHumanString(startDate, endDate) {
-    throw new Error('Not implemented');
+    let diff = endDate - startDate;
+    let seconds = diff / 1000;
+    if (seconds >= 0 && seconds <= 45) return 'a few seconds ago';
+    else if (seconds > 45 && seconds <= 90) return 'a minute ago';
+    else if (seconds > 90 && seconds <= 45 * 60) return ((Math.floor(seconds / 60) == 1) ? 2 : Math.floor(seconds / 60)) + ' minutes ago';
+    else if (seconds > 45 * 60 && seconds <= 90 * 60) return 'an hour ago';
+    else if (seconds > 90 * 60 && seconds <= 22 * 60 * 60) return (Math.abs((seconds / 3600) - Math.floor(seconds / 3600))  > 0.5 ? Math.ceil(seconds / 3600) : Math.floor(seconds / 3600)) + ' hours ago';
+    else if (seconds > 22 * 60 * 60 && seconds <= 36 * 60 * 60) return 'a day ago';
+    else if (seconds > 36 * 60 * 60 && seconds <= 25 * 24 * 60 * 60) return ( Math.abs((seconds / (24 * 60 * 60)) - Math.floor(seconds / (24 * 60 * 60))) > 0.5 ? Math.ceil(seconds / (24 * 60 * 60)) : Math.floor(seconds / (24 * 60 * 60)) ) + ' days ago';
+    else if (seconds > 25 * 24 * 60 * 60 && seconds <= 45 * 24 * 60 * 60) return 'a month ago';
+    else if (seconds > 45 * 24 * 60 * 60 && seconds <= 345 * 24 * 60 * 60) return ( Math.abs( (seconds / (30 *24 * 60 * 60)) - Math.floor(seconds / (30 *24 * 60 * 60)) ) > 0.5 ? Math.ceil(seconds / (30 *24 * 60 * 60)) : Math.floor(seconds / (30 *24 * 60 * 60)) ) + ' months ago';
+    else if (seconds > 345 * 24 * 60 * 60 && seconds <= 545 * 24 * 60 * 60) return 'a year ago';
+    else return Math.round(seconds / (365 * 24 * 60 * 60)) + ' years ago';
 }
 
 
